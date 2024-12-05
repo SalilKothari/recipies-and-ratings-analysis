@@ -32,6 +32,11 @@ Lastly, we will give an overview of the dataset for convenience throughout the r
 # Data Cleaning and Exploratory Analysis
 
 Preview of Cleaned Recipes DataFrame:
+
+```py
+print(df_new.head().to_markdown(index=False))
+```
+
 | name                               |     id | minutes | contributor_id | submitted           | tags                 | n_steps | steps           | description       | ingredients             | n_ingredients |   user_id | recipe_id | date                | rating | review            | avg_rating | calories (#) | total fat (PDV) | sugar (PDV) | sodium (PDV) | protein (PDV) | saturated fat (PDV) | carbohydrates (PDV) | tags_length |
 |:-----------------------------------|-------:|---------:|---------------:|:--------------------|:----------------------|--------:|:----------------|:------------------|:------------------------|--------------:|----------:|----------:|:--------------------|-------:|:-----------------|-----------:|-------------:|----------------:|------------:|-------------:|--------------:|--------------------:|--------------------:|------------:|
 | 1 brownies in the world best ever  | 333281 |      40 |         985201 | 2008-10-27 00:00:00 | ["'60-minutes-or-less'", ...] |      10 | ['heat the...', ...] | these are the...  | ['bittersweet...', ...] |             9 |    386585 |   333281 | 2008-11-19 00:00:00 |      4 | These were pretty... |          4 |        138.4 |              10 |          50 |           3 |             3 |                  19 |                   6 |          14 |
@@ -49,13 +54,17 @@ Univariate Cooking Time Distribution:
   height="300"
   frameborder="0"
 ></iframe>
+The graph abov represents the distribution of cooking time across the recipes in our dataset
+
+
+
 
 
 Univariate Calorie (#) Distribution:
 <iframe
   src="assets/univariate-calorie-dist.html"
-  width="400"
-  height="300"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
@@ -63,24 +72,24 @@ Univariate Calorie (#) Distribution:
 Univariate Average Rating (1-5) Distribution:
 <iframe
   src="assets/univariate-rating-dist.html"
-  width="400"
-  height="300"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
 Bivariate Cooktime vs Average Rating:
 <iframe
   src="assets/bivariate-cooktime-rating-avg.html"
-  width="400"
-  height="300"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
 Bivariate Total Fat vs Calories (#):
 <iframe
   src="assets/bivariate-totalfat-calories.html"
-  width="400"
-  height="300"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
@@ -98,8 +107,17 @@ We will initially be using a multiple linear regression model with 3 features: t
 
 Although we know how strong our model is on this data, we still need to see how strong it will be on generalized unseen data. Therefore, we will be conducting a training and test split to have the test data evaluate  our model instead of solely using the R^2 value.
 
-Below, we are still using the same baseline model with the same features (total fat, carbs, and sugar), but we will split the data into training and testing data so that we can see how well our model would generalize to unseen data. Specifically, we will train our model on the training data, and evaluate its performance on both the training data and testing data to see if there is large variance between the 2. 
+Below, we are still using the same baseline model with the same quantitative, features (total fat, carbs, and sugar), but we will split the data into training and testing data so that we can see how well our model would generalize to unseen data. Specifically, we will train our model on the training data, and evaluate its performance on both the training data and testing data to see if there is large variance between the 2. 
 
+
+
+----------------
+We can see here that our testing MSE was much lower than the training MSE, which indicates that there may
+be some noise in our training data that is affecting the model's performance on the training data. From
+our analysis of the dataset in the earlier parts, we saw that there were lots of outliers in the some of 
+the nutritional data values, which means our training data may have been affected by this. Another possibility is that our model may be underfitting, which means it is too simple and can be made more complex to improve the overall model performance.
+
+So, from our results above, we can see that our current baseline model that uses 3 features (total fat, carbs, and sugar) to predict the calories of a recipe is relatively strong, but may be a bit too simple and can be improved by transforming current features or creating new ones to make the model more complex, potentially increasing its performance. We will explore how to do so in the next section. 
 
 
 # Final Model
