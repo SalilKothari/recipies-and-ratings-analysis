@@ -45,7 +45,7 @@ Dataframe:
 
 Univariate Cooking Time Distribution:
 <iframe
-  src="/assets/univariate-cooking-time-dist.html"
+  src="assets/univariate-cooking-time-dist.html"
   width="400"
   height="300"
   frameborder="0"
@@ -54,7 +54,7 @@ Univariate Cooking Time Distribution:
 
 Univariate Calorie (#) Distribution:
 <iframe
-  src="/assets/univariate-calorie-dist.html"
+  src="assets/univariate-calorie-dist.html"
   width="400"
   height="300"
   frameborder="0"
@@ -63,7 +63,7 @@ Univariate Calorie (#) Distribution:
 
 Univariate Rating (1-5) Distribution:
 <iframe
-  src="/assets/univariate-rating-dist.html"
+  src="assets/univariate-rating-dist.html"
   width="400"
   height="300"
   frameborder="0"
@@ -71,7 +71,7 @@ Univariate Rating (1-5) Distribution:
 
 Bivariate Cooktime vs Average Rating:
 <iframe
-  src="/assets/bivariate-cooktime-rating-avg.html"
+  src="assets/bivariate-cooktime-rating-avg.html"
   width="400"
   height="300"
   frameborder="0"
