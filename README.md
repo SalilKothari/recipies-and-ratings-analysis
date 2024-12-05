@@ -61,7 +61,7 @@ Univariate Calorie (#) Distribution:
 ></iframe>
 
 
-Univariate Rating (1-5) Distribution:
+Univariate Average Rating (1-5) Distribution:
 <iframe
   src="assets/univariate-rating-dist.html"
   width="400"
