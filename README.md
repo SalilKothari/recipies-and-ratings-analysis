@@ -1,5 +1,5 @@
 
-# Recipes and Ratings Analysis 👨‍🍳
+# Dish Decipher 👨‍🍳
 Analyzing Recipes and Ratings Dataset
 
 By: Abhi Attaluri & Salil Kothari
