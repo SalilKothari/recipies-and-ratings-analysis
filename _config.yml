@@ -3,5 +3,13 @@ markdown: kramdown
 kramdown:
   input: GFM
 title: null
+minima:
+  include_title: false
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+      title: null
 # plugins:
 # - jekyll-remote-theme # add this line to the plugins list if you already have one

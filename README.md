@@ -1,3 +1,4 @@
+
 # Recipes and Ratings Analysis 👨‍🍳
 Analyzing Recipes and Ratings Dataset
 
@@ -209,7 +210,6 @@ The metric we are using to evaluate our model is Mean Squared Error, because it 
 At the time of prediction, all we knew were the macronutrient values, including total fat, sugar, and carbohydrates. We also had data about reviews and later on, engineered features such as the number of tags attached to a recipe.
 
 We would go on to use fat, carbohydrates, and sugar in our Baseline Model.
------
 
 
 # Baseline Model
@@ -295,7 +295,7 @@ So, from our results above, we can see that our current baseline model that uses
 
 # Final Model
 
-For our final model, we decided that one new feautre we will add is choosing hyperparameters before fitting our model to the data so that we increase the model's complexity. Specifically, we chose Polynomial Degrees as our first hyperparameter since we can apply that to our current numerical features (total fat, carbs, and sugar). We will use k-fold cross validation to tune the polynomial degree in order to find the 'best' degree - where 'best' in this context refers to the degree that achieves the best model performance. Similar to what we did previously, we will compute the training and test errors to evaluate our model's performance. We chose to do this as one of the hyperparamters because we felt that there was a chance the relationship was not linear. Specifically, although we saw a relatively linear relationship for this data, we were not sure about how it would perform on unseen data, so we wanted to find the best Polynomial Degree for this data. Additionally, this is a very common hyperparamter that is used on numerical data, and it often improves the model's performance because we are tuning the hyperparameter before applying it to the final mode, which is why it is ideal for this task. 
+For our final model, we decided that one new feature we will add is choosing hyperparameters before fitting our model to the data so that we increase the model's complexity. Specifically, we chose Polynomial Degrees as our first hyperparameter since we can apply that to our current numerical features (total fat, carbs, and sugar). We will use k-fold cross validation to tune the polynomial degree in order to find the 'best' degree - where 'best' in this context refers to the degree that achieves the best model performance. Similar to what we did previously, we will compute the training and test errors to evaluate our model's performance. We chose to do this as one of the hyperparamters because we felt that there was a chance the relationship was not linear. Specifically, although we saw a relatively linear relationship for this data, we were not sure about how it would perform on unseen data, so we wanted to find the best Polynomial Degree for this data. Additionally, this is a very common hyperparameter that is used on numerical data, and it often improves the model's performance because we are tuning the hyperparameter before applying it to the final model, which is why it is ideal for this task. 
 
 Secondly, we will one-hot encode the 'tags_length' variable by splitting it into bins, and one-hot encoding those bins. We are doing this because we hypothesized that the length of the tags may indicate a recipe's popularity, and more popular recipes may also correlate to higher-calorie recipes since those are the ones that people generally tend to enjoy more. Therefore, one-hot encoding this and incorporating it into our model will not only increase our model's complexity but also provide other data for the model to work with to better predict the calories, making it ideal for this task.
 
@@ -358,7 +358,7 @@ Since we are performing transformation on different columns, we needed to use sk
 
 After performing the transformations, we were then ready to make the pipeline and perform k-fold cross validation, which is done automatically using GridSearchCV, another class in sklearn. The 'cv = 5' argument tells us that we have 5 folds, meaning there are 5 validations sets that we compare the training set to in order to improve the model's performance. The reason this improves the model's performance is because each data point is used for training 4 times and validation once, which allows us to average the performance (measured in MSE) and then apply it to the model, giving us confidence that our model can generalize pretty well to unseen data since we performed it more times than any regular base model. 
 
-This technique helps find the best hyperparamter, and at the end of the process, we found the following results:
+This technique helps find the best hyperparameter, and at the end of the process, we found the following results:
 
 As suspected, the relationship is indeed linear, so running the .best_params method tells us the best hyperparameter for our model, which in our case was a polynomial degree of 1:
 
@@ -368,7 +368,7 @@ searcher.best_params_
 >>> {'columntransformer__polynomialfeatures__degree': 1}
 
 
-So, now that we found what hyperparamter our model used to optimize its performance, we can actually see its performance for ourselves by employing the same technique we did above: comparing the training and testing MSEs:
+So, now that we found what hyperparameter our model used to optimize its performance, we can actually see its performance for ourselves by employing the same technique we did above: comparing the training and testing MSEs:
 
 ```py
 pred_train = searcher.predict(X_train)
@@ -386,7 +386,7 @@ mse_test
 
 As we can see, the model seems to now perform well on generalized unseen data because it has a much lower test error than training error, and this is after we performed k-fold cross validation. Additionally, we can notice that the MSE values themselves are also smaller with this model, indicating that while the improvement was not much, one-hot encoding the tag lengths seemed to help improve the model's overall performance. Lastly, it seems that the relationship between the macronutrients (total fat, carbs, and sugar) that we used and the calories is linear, as our model performed best with a polynomial degree of 1.
 
-Overall, since the MSE is much lower for our final model and the test error is much lower than the training error, that shows that our final model is a slight improvement from our base model. This improvement occurred primarily because we increased the complexity by adding the One-Hot Encoding of 'tags_length', and because we used k-fold cross validation to optimize our hyperparamter.
+Overall, since the MSE is much lower for our final model and the test error is much lower than the training error, that shows that our final model is a slight improvement from our base model. This improvement occurred primarily because we increased the complexity by adding the One-Hot Encoding of 'tags_length', and because we used k-fold cross validation to optimize our hyperparameter.
 
 
 # Conclusion
