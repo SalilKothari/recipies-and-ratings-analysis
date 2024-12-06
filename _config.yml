@@ -2,5 +2,6 @@ theme: minima
 markdown: kramdown
 kramdown:
   input: GFM
+title: null
 # plugins:
 # - jekyll-remote-theme # add this line to the plugins list if you already have one

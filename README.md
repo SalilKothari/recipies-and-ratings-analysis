@@ -1,11 +1,15 @@
 # Recipes and Ratings Analysis 👨‍🍳
-Analyzing Recipies and Ratings Dataset
+Analyzing Recipes and Ratings Dataset
+
+By: Abhi Attaluri & Salil Kothari
 
 # Introduction
 
 Our dataset consists of information on recipes, as well as associated reviews and ratings for each of those recipes. Some important data regarding the recipes dataset to keep note of throughout the report are the nutrition values (calories, total fat, carbs, sugar, etc.), the average ratings, and the cooking time. 
 
 We wanted to center our analysis around variables like the average rating, calories, and the cooking time, so we asked the question: what is the relationship between average rating and calories? 
+
+We feel this is an important question to explore because it is important to try and find relationships between variables which we would never think could be related with each other, and doing so with something that everyone can relate with, such as food and recipes, puts a fun twist to data analysis. 
 
 Although our analysis is centered around this question, we still chose to explore all variables of interest, including cooking time and the other macronutrients. 
 
@@ -196,43 +200,197 @@ Besides the average rating, we can observe that the rest of the relevant variabl
 
 # Framing a Prediction Problem
 
-Our prediction problem is predicting the number of calories in a specific recipie since we were unable to find strong relationships between calories and other nutrients. Since we are predicting the single numeric value of calories, this is a regression problem. 
+Our problem is predicting the number of calories in a specific recipe since we were unable to find strong relationships between calories and other nutrients. Since we are predicting the single numeric value of calories, this is a regression problem.
 
-The variable to predict is calories (#), since we were most curious about it. 
+The variable to predict is calories (#), since we were most curious about it.
 
-The Metric we are using to evaluate our model is Mean Squared Error, because it is best fo
- a Linear Regression Model. We additionallyexamined the $R^2$ Pearson Correlation Coefficient to view the strength of relationships between various features and the variable to predict, calories. 
+The metric we are using to evaluate our model is Mean Squared Error, because it is best for a Linear Regression Model. Additionally, we examined $R^2$, the Pearson Correlation Coefficient, which showed us the strength of relationships between the target variable and various features and helped us understand the strength of our model. We chose this over other metrics because our baseline model was a multiple linear regression model with only 3 features, so looking at the MSE and $R^2$ was the best metric at that point in time. Additionally, using something like accuracy would not be applicable for this problem since we are looking at a numerical prediction, not a classification. 
 
+At the time of prediction, all we knew were the macronutrient values, including total fat, sugar, and carbohydrates. We also had data about reviews and later on, engineered features such as the number of tags attached to a recipe.
 
-
-
-Although it is not directly related to the question we posed for analysis, we still performed lots of analysis on the calories of a recipe and will focus mostly on calories for the remainder of the project.
-
-
-
-
+We would go on to use fat, carbohydrates, and sugar in our Baseline Model.
 -----
-
-
-We will initially be using a multiple linear regression model with 3 features: total fat, carbohydrates, and sugar. To evaluate the strength of this model, we will calculate the $R^2$ coefficient, which represents how strongly correlated the relationship between the predictor variables and our response variable is, thus representing the strength of the model.
 
 
 # Baseline Model
 
-Although we know how strong our model is on this data, we still need to see how strong it will be on generalized unseen data. Therefore, we will be conducting a training and test split to have the test data evaluate  our model instead of solely using the R^2 value.
+We will initially be using a multiple linear regression model with 3 features: total fat, carbohydrates, and sugar. To evaluate the strength of this model, we will calculate both the MSE and the $R^2$ coefficient, which represents how strongly correlated the relationship between the predictor variables and our response variable is, thus representing the strength of the model. The total fat, sugar, and carbohydrates are all measured in PDV (percent daily value), so we did not feel the need to apply any standardization transformations to it. 
 
-Below, we are still using the same baseline model with the same quantitative, features (total fat, carbs, and sugar), but we will split the data into training and testing data so that we can see how well our model would generalize to unseen data. Specifically, we will train our model on the training data, and evaluate its performance on both the training data and testing data to see if there is large variance between the 2. 
+To use these variables, we employed the changes as described in section 2: Data Cleaning and Exploratory Analysis. Specifically, making each of these values into its own column allowed us to easily use them as features in our model as shown below:
 
+```py
+multi_model = LinearRegression()
+multi_model.fit(X=df_new[['total fat (PDV)', 'carbohydrates (PDV)', 'sugar (PDV)']], y=df_new['calories (#)'])
+```
 
+This code above fit our model on the 3 features, and identified the variable we were going to predict, which was calories. 
 
-----------------
-We can see here that our testing MSE was much lower than the training MSE, which indicates that there may
-be some noise in our training data that is affecting the model's performance on the training data. From
-our analysis of the dataset in the earlier parts, we saw that there were lots of outliers in the some of 
-the nutritional data values, which means our training data may have been affected by this. Another possibility is that our model may be underfitting, which means it is too simple and can be made more complex to improve the overall model performance.
+Below, we computed the mean squared error for the model, by using the mean_squared_error and .predict() functions, which are a part of sklearn. 
+
+```py
+mean_squared_error(df_new['calories (#)'], 
+                   multi_model.predict(df_new[['total fat (PDV)', 'carbohydrates (PDV)', 'sugar (PDV)']]))
+```
+>>> 8834.033177215146
+
+Now, as for the $R^2$ coefficient, we can use the .score() method:
+
+```py
+multi_model.score(df_new[['total fat (PDV)', 'carbohydrates (PDV)', 'sugar (PDV)']], df_new['calories (#)'])
+```
+
+>>> 0.9740288778674402
+
+From these 2 calculations, we computed an MSE of **8834.03** and an $R^2$ value of **0.97**, which is quite strong, and confirms our hypothesis that macronutrients are a good predictor of the calories.
+
+Although we know how strong our model is on this data, we still need to see how strong it will be on generalized unseen data. Therefore, we will be conducting a training and test split to have the test data evaluate  our model instead of solely using the $R^2$ value.
+
+Below, we are still using the same baseline model with the same quantitative, features (total fat, carbs, and sugar), but we will split the data into training and testing data so that we can see how well our model would generalize to unseen data. Specifically, we will train our model on the training data, and evaluate its performance on both the training data and testing data to see if there is large variance between the 2. We will be using sklearn's train_test_split function to conduct this split:
+
+```py
+from sklearn.model_selection import train_test_split
+```
+
+```py
+X = df_new[['total fat (PDV)', 'carbohydrates (PDV)', 'sugar (PDV)']]
+y = df_new['calories (#)']
+# using default split of 70/30
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=23)
+```
+
+Now, the difference is that we fit the model on the training set only, and then use the model to predict values in the test set:
+
+```py
+multi_model_train = LinearRegression()
+multi_model_train.fit(X_train, y_train)
+```
+
+First, we will check our model's performance on the training set:
+
+```py
+pred_train = multi_model_train.predict(X_train)
+mse_train = mean_squared_error(y_train, pred_train)
+mse_train
+```
+
+>>> 9261.011748852132
+
+From this computation, we got an MSE of **9261.01** for our training set.
+
+Next, we will compare this value to the testing MSE:
+
+```py
+pred_test = multi_model_train.predict(X_test)
+mse_test = mean_squared_error(y_test, pred_test)
+mse_test
+```
+
+>>> 7564.291787226931
+
+From this computation, we got an MSE of **7564.29**. 
+
+We can see here that our testing MSE was much lower than the training MSE, which indicates that there may be some noise in our training data that is affecting the model's performance on the training data. From our analysis of the dataset in the earlier parts, we saw that there were lots of outliers in the some of the nutritional data values, which means our training data may have been affected by this. Another possibility is that our model may be underfitting, which means it is too simple and can be made more complex to improve the overall model performance.
 
 So, from our results above, we can see that our current baseline model that uses 3 features (total fat, carbs, and sugar) to predict the calories of a recipe is relatively strong, but may be a bit too simple and can be improved by transforming current features or creating new ones to make the model more complex, potentially increasing its performance. We will explore how to do so in the next section. 
 
-
 # Final Model
 
+For our final model, we decided that one new feautre we will add is choosing hyperparameters before fitting our model to the data so that we increase the model's complexity. Specifically, we chose Polynomial Degrees as our first hyperparameter since we can apply that to our current numerical features (total fat, carbs, and sugar). We will use k-fold cross validation to tune the polynomial degree in order to find the 'best' degree - where 'best' in this context refers to the degree that achieves the best model performance. Similar to what we did previously, we will compute the training and test errors to evaluate our model's performance. We chose to do this as one of the hyperparamters because we felt that there was a chance the relationship was not linear. Specifically, although we saw a relatively linear relationship for this data, we were not sure about how it would perform on unseen data, so we wanted to find the best Polynomial Degree for this data. Additionally, this is a very common hyperparamter that is used on numerical data, and it often improves the model's performance because we are tuning the hyperparameter before applying it to the final mode, which is why it is ideal for this task. 
+
+Secondly, we will one-hot encode the 'tags_length' variable by splitting it into bins, and one-hot encoding those bins. We are doing this because we hypothesized that the length of the tags may indicate a recipe's popularity, and more popular recipes may also correlate to higher-calorie recipes since those are the ones that people generally tend to enjoy more. Therefore, one-hot encoding this and incorporating it into our model will not only increase our model's complexity but also provide other data for the model to work with to better predict the calories, making it ideal for this task.
+
+Additionally, we will be performing k-fold cross validation because we observed that our test MSE was much lower for our baseline model, which may indicate that it was overfitting to the test set. To prevent this, we will have 'k' validation sets, and compare the performance with those validaiton sets before evaluating our model on the test set.
+
+
+So, as described above, we decided to one-hot encode the 'tags_length' variable. However, before doing so, we had to do some more data manipulation and split the 'tags_length' variable into bins, where each bin value represents what 5-interval range the tag length was in for that recipe. For instance, if the bin value was a value of 15, that means that the tag length for that recipe was between 10 and 15 (inclusive, exclusive). In order to perform this transformation, we used the pd.cut() function, which is often used for binning variables:
+
+```py
+bins = np.arange(0, 51, 5)
+labels = bins[1:]
+make_tags_length_bins = Pipeline([
+    ('binning', FunctionTransformer(lambda df: pd.cut(
+        df_new['tags_length'],
+        bins=bins,
+        labels=labels,
+        right=False
+    ).astype(int).to_frame(name='tags_length_bins')))
+])
+
+binned_values = make_tags_length_bins.fit_transform(df_new)
+df_new = pd.concat([df_new, binned_values], axis=1)
+df_new['tags_length_bins'] = df_new['tags_length_bins'].astype('category')
+```
+
+This ended up creating a new column called 'tags_length_bins', and we made it a category so that it could be used for One-Hot Encoding. 
+
+Now, we will perform the same train-test split as before, but this time include our new feature 'tags_length_bins':
+
+```py
+X = df_new[['total fat (PDV)', 'carbohydrates (PDV)', 'sugar (PDV)', 'tags_length_bins']]
+y = df_new['calories (#)']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=23)
+```
+
+Next, after performing the split, this is where we actually build the pipeline, since we are incorporating 2 new features into our original Linear Regression model (note that we are still using the same baseline Linear Regression model):
+
+```py
+preprocessing = make_column_transformer(
+    (OneHotEncoder(drop='first'), ['tags_length_bins']),
+    (PolynomialFeatures(), ['total fat (PDV)', 'carbohydrates (PDV)', 'sugar (PDV)'])
+)
+
+hyperparams = {
+    'columntransformer__polynomialfeatures__degree': (1, 16)
+}
+
+searcher = GridSearchCV(
+    make_pipeline(preprocessing, LinearRegression()),
+    param_grid=hyperparams,
+    cv=5,
+    scoring='neg_mean_squared_error',
+    error_score='raise'
+)
+searcher
+```
+
+Since we are performing transformation on different columns, we needed to use sklearn's make_column_transformer() function, which allows us to perform transformations in our pipeline on specific columns. So, as you can see above, we performed the One-Hot Encoding for the binned tag lengths, and then incorporated the PolynomialFeatures() feature, testing degrees 1-15 for our macronutrients' coefficients. 
+
+After performing the transformations, we were then ready to make the pipeline and perform k-fold cross validation, which is done automatically using GridSearchCV, another class in sklearn. The 'cv = 5' argument tells us that we have 5 folds, meaning there are 5 validations sets that we compare the training set to in order to improve the model's performance. The reason this improves the model's performance is because each data point is used for training 4 times and validation once, which allows us to average the performance (measured in MSE) and then apply it to the model, giving us confidence that our model can generalize pretty well to unseen data since we performed it more times than any regular base model. 
+
+This technique helps find the best hyperparamter, and at the end of the process, we found the following results:
+
+As suspected, the relationship is indeed linear, so running the .best_params method tells us the best hyperparameter for our model, which in our case was a polynomial degree of 1:
+
+```py
+searcher.best_params_
+```
+>>> {'columntransformer__polynomialfeatures__degree': 1}
+
+
+So, now that we found what hyperparamter our model used to optimize its performance, we can actually see its performance for ourselves by employing the same technique we did above: comparing the training and testing MSEs:
+
+```py
+pred_train = searcher.predict(X_train)
+mse_train = mean_squared_error(y_train, pred_train)
+mse_train
+```
+>>> 9235.80
+
+```py
+pred_test = searcher.predict(X_test)
+mse_test = mean_squared_error(y_test, pred_test)
+mse_test
+```
+>>> 7540.77
+
+As we can see, the model seems to now perform well on generalized unseen data because it has a much lower test error than training error, and this is after we performed k-fold cross validation. Additionally, we can notice that the MSE values themselves are also smaller with this model, indicating that while the improvement was not much, one-hot encoding the tag lengths seemed to help improve the model's overall performance. Lastly, it seems that the relationship between the macronutrients (total fat, carbs, and sugar) that we used and the calories is linear, as our model performed best with a polynomial degree of 1.
+
+Overall, since the MSE is much lower for our final model and the test error is much lower than the training error, that shows that our final model is a slight improvement from our base model. This improvement occurred primarily because we increased the complexity by adding the One-Hot Encoding of 'tags_length', and because we used k-fold cross validation to optimize our hyperparamter.
+
+
+# Conclusion
+
+So, at the end of all this analysis on the recipes, what did we learn? 
+
+We were able to conclude that this dataset did not have too many categorical variables we could use for our model, and instead that the macronutrients were the most interesting the explore because they were very highly correlated with each other. Therefore, this allowed us to create a model using some of the macronutrients to predict calories, where we concluded that given total fat, sugar, and carbohydrates of a recipe we can pretty accurately predict the calories of that recipe. This also aligns with our initial hypothesis, and does make sense intuitively!
